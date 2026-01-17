@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Redução de Horas Extras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .calendar-day {
+            min-height: 120px;
+            background-color: white;
+            padding: 8px;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .calendar-day:hover {
+            background-color: #f5f3ff;
+        }
+
+        .calendar-day.empty {
+            background-color: #f9fafb;
+        }
+
+        .calendar-day.today {
+            background-color: #eef2ff;
+            border: 2px solid #6366f1;
+        }
+
+        .day-number {
+            font-weight: bold;
+            margin-bottom: 4px;
+            color: #4b5563;
+        }
+
+        .add-comment-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #6366f1;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .calendar-day:hover .add-comment-btn {
+            opacity: 1;
+        }
+
+        /* Estilos para as novas funcionalidades - MODIFICADO */
+        .extra-hours-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .extra-hours-container h3 {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* APENAS ESTA PARTE FOI ALTERADA - agora em coluna única */
+        .person-input-group {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .person-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .person-card label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .person-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .person-input::placeholder {
+            color: rgba(0, 0, 0, 0.5);
+        }
+
+        .hours-input {
+            margin-top: 0.75rem;
+        }
+
+        .hours-input label {
+            color: rgba(255, 255, 255, 0.9);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .hours-input .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hours-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .hours-input span {
+            color: white;
+            font-weight: 500;
+            min-width: 50px;
+            font-size: 0.9rem;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            color: #667eea;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-container {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .results-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 0.5rem 0;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+        }
+
+        .result-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 500;
+            color: #4b5563;
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .positive {
+            color: #ef4444;  /* Vermelho - (Ainda tem horas positivas) */
+        }
+        .negative {
+            color: #10b981;  /* verde - (ainda precisa reduzir) */
+        }
+        .neutral {
+            color: #3b82f6;  /* Azul - Neutro (zerou exatamente) */
+        }
+        
+        /* Botão de Reset */
+        .reset-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(239, 68, 68, 0.2);
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        /* Modal de configuração de pessoa - MODIFICADO para múltiplas pessoas */
+        .person-config-modal {
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .config-form {
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-group select,
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* Estilo para seleção múltipla de pessoas */
+        .person-selection-container {
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #d1d5db;
+        }
+
+        .person-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        .person-checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+
+        .person-checkbox-item:hover {
+            background-color: #e5e7eb;
+        }
+
+        .person-checkbox-item input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+
+        .person-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .person-color-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .work-type-group {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .work-type-option {
+            text-align: center;
+        }
+
+        .work-type-option input[type="radio"] {
+            display: none;
+        }
+
+        .work-type-label {
+            display: block;
+            padding: 0.75rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            height: 100%;
+        }
+
+        .work-type-label:hover {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+
+        .work-type-option input[type="radio"]:checked + .work-type-label {
+            border-color: #6366f1;
+            background-color: #eef2ff;
+            color: #4f46e5;
+            font-weight: 500;
+        }
+
+        /* Grupos de horas específicas */
+        .hours-config-group {
+            margin-top: 1rem;
+            padding: 1rem;
+            background-color: #f9fafb;
+            border-radius: 0.5rem;
+            border-left: 4px solid;
+        }
+
+        .lunch-hours-group {
+            border-left-color: #10b981;
+        }
+
+        .dayoff-hours-group {
+            border-left-color: #ef4444;
+        }
+
+        .saturday-off-group {
+            border-left-color: #8b5cf6;
+        }
+
+        .hours-config-group.hidden {
+            display: none;
+        }
+
+        .hours-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .hours-select {
+            width: 140px;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+        }
+
+        /* Indicador no dia do calendário - MODIFICADO para mostrar múltiplas pessoas */
+        .person-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+
+        /* Cores para 10 pessoas diferentes */
+        .person-1 { background-color: #3b82f6; }  /* Azul */
+        .person-2 { background-color: #10b981; }  /* Verde */
+        .person-3 { background-color: #f59e0b; }  /* Amarelo */
+        .person-4 { background-color: #ef4444; }  /* Vermelho */
+        .person-5 { background-color: #8b5cf6; }  /* Roxo */
+        .person-6 { background-color: #ec4899; }  /* Rosa */
+        .person-7 { background-color: #06b6d4; }  /* Ciano */
+        .person-8 { background-color: #84cc16; }  /* Verde Lima */
+        .person-9 { background-color: #f97316; }  /* Laranja */
+        .person-10 { background-color: #64748b; } /* Cinza */
+
+        .day-info {
+            font-size: 0.65rem;
+            margin-top: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            line-height: 1.3;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .worked-day {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .dayoff-day {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .saturday-off-day {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        /* Contador de pessoas selecionadas */
+        .selected-count {
+            display: inline-block;
+            background-color: #6366f1;
+            color: white;
+            font-size: 0.75rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: 9999px;
+            margin-left: 0.5rem;
+        }
+
+        /* Animações */
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #person-modal {
+            animation: modalFadeIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .results-container {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        /* Status indicators */
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-working {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-dayoff {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status-saturday {
+            background-color: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        /* Scrollbar personalizada */
+        .results-container::-webkit-scrollbar,
+        .person-selection-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .results-container::-webkit-scrollbar-track,
+        .person-selection-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb,
+        .person-selection-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .results-container::-webkit-scrollbar-thumb:hover,
+        .person-selection-container::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navbar Component -->
+    <script>
+        class CustomNavbar extends HTMLElement {
+            connectedCallback() {
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        nav {
+                            background-color: #4f46e5;
+                            color: white;
+                            padding: 1rem 2rem;
+                            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                        }
+                        .container {
+                            max-width: 1400px;
+                            margin: 0 auto;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                        }
+                        .logo {
+                            font-size: 1.5rem;
+                            font-weight: bold;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+                        .nav-links {
+                            display: flex;
+                            gap: 1.5rem;
+                        }
+                        a {
+                            color: white;
+                            text-decoration: none;
+                            font-weight: 500;
+                            transition: opacity 0.2s;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.3rem;
+                        }
+                        a:hover {
+                            opacity: 0.8;
+                        }
+                        @media (max-width: 768px) {
+                            nav {
+                                padding: 1rem;
+                            }
+                            .nav-links {
+                                gap: 1rem;
+                            }
+                        }
+                    </style>
+                    <nav>
+                        <div class="container">
+                            <div class="logo">
+                                <i data-feather="clock"></i>
+                                <span>Redutor de Horas Extras</span>
+                            </div>
+                            <div class="nav-links">
+                                <a href="#"><i data-feather="home"></i> Início</a>
+                                <a href="#"><i data-feather="info"></i> Como Usar</a>
+                            </div>
+                        </div>
+                    </nav>
+                `;
+            }
+        }
+        customElements.define('custom-navbar', CustomNavbar);
+    </script>
+
+    <custom-navbar></custom-navbar>
+
+    <main class="container mx-auto px-4 py-8 max-w-7xl">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Calculadora de Redução de Horas Extras</h1>
+            <p class="text-lg text-gray-600">Reduza horas extras para até 10 pessoas</p>
+        </div>
+
+        <!-- Botão de Reset -->
+        <div class="flex justify-end mb-6">
+            <button id="reset-all-btn" class="reset-btn">
+                <i data-feather="trash-2"></i>
+                Resetar Todos os Dados
+            </button>
+        </div>
+
+        <!-- Seção de cálculo de horas extras -->
+        <section class="extra-hours-container">
+            <h3>
+                <i data-feather="users"></i>
+                Configurar Horas Extras (10 Pessoas)
+            </h3>
+            <div class="person-input-group" id="person-inputs-container">
+                <!-- Os campos serão gerados dinamicamente pelo JavaScript -->
+            </div>
+            
+            <button id="calculate-hours" class="calculate-btn">
+                <i data-feather="refresh-cw"></i>
+                Calcular Saldo de Todas as Pessoas
+            </button>
+            
+            <div id="results-container" class="results-container hidden">
+                <div class="results-header">
+                    <i data-feather="bar-chart-2"></i>
+                    Resultados do Cálculo (10 Pessoas)
+                </div>
+                <div id="results-list">
+                    <!-- Os resultados serão gerados dinamicamente -->
+                </div>
+                <div class="result-item mt-4 pt-4 border-t-2">
+                    <span class="result-label font-bold">Status Geral</span>
+                    <div id="status-indicator" class="status-indicator">
+                        <span id="status-text">Não calculado</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mb-6 bg-white p-6 rounded-xl shadow-sm">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">Como funciona:</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-4 bg-blue-50 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-feather="edit" class="text-blue-600"></i>
+                        <h3 class="font-medium text-blue-700">1. Configure as horas</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Digite os nomes e o total de horas extras de cada pessoa (até 10 pessoas)</p>
+                </div>
+                <div class="p-4 bg-green-50 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-feather="calendar" class="text-green-600"></i>
+                        <h3 class="font-medium text-green-700">2. Marque os dias</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Clique nos dias para configurar folgas, sábados não trabalhados ou trabalho com almoço para uma ou mais pessoas</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-lg">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-feather="calculator" class="text-purple-600"></i>
+                        <h3 class="font-medium text-purple-700">3. Veja o resultado</h3>
+                    </div>
+                    <p class="text-sm text-gray-600">Clique em "Calcular Saldo" para ver quanto cada pessoa ainda tem de horas extras</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-6">
+            <h2 id="current-month-year" class="text-2xl font-semibold text-gray-800"></h2>
+            <div class="flex space-x-2">
+                <button id="prev-month" class="p-2 rounded-full hover:bg-gray-200 transition">
+                    <i data-feather="chevron-left"></i>
+                </button>
+                <button id="next-month" class="p-2 rounded-full hover:bg-gray-200 transition">
+                    <i data-feather="chevron-right"></i>
+                </button>
+                <button id="today-btn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                    Hoje
+                </button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden mb-8">
+            <div class="grid grid-cols-7 bg-indigo-100">
+                <div class="py-3 text-center font-medium text-indigo-800">Dom</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Seg</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Ter</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Qua</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Qui</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Sex</div>
+                <div class="py-3 text-center font-medium text-indigo-800">Sáb</div>
+            </div>
+            <div id="calendar-grid" class="grid grid-cols-7 gap-px bg-gray-200"></div>
+        </div>
+
+        <!-- Modal para configuração de dias - MODIFICADO para múltiplas pessoas -->
+        <div id="person-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg p-6 person-config-modal">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold" id="person-modal-title">Configurar Dia</h3>
+                    <button id="close-person-modal" class="text-gray-500 hover:text-gray-700">
+                        <i data-feather="x"></i>
+                    </button>
+                </div>
+                
+                <div class="config-form">
+                    <div class="form-group">
+                        <label>Selecionar Pessoas <span id="selected-count" class="selected-count">0</span></label>
+                        <div class="person-selection-container">
+                            <div class="person-checkbox-group" id="person-checkbox-container">
+                                <!-- As checkboxes serão geradas dinamicamente -->
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 mt-2">Selecione uma ou mais pessoas para aplicar a mesma configuração a todas elas.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Tipo do Dia</label>
+                        <div class="work-type-group">
+                            <div class="work-type-option">
+                                <input type="radio" id="work-type-normal" name="work-type" value="normal" checked>
+                                <label for="work-type-normal" class="work-type-label">
+                                    <i data-feather="briefcase" class="w-5 h-5 mx-auto mb-1"></i>
+                                    <div>Trabalho</div>
+                                    <div class="text-xs text-gray-500">com almoço</div>
+                                </label>
+                            </div>
+                            <div class="work-type-option">
+                                <input type="radio" id="work-type-dayoff" name="work-type" value="dayoff">
+                                <label for="work-type-dayoff" class="work-type-label">
+                                    <i data-feather="umbrella" class="w-5 h-5 mx-auto mb-1"></i>
+                                    <div>Folga</div>
+                                    <div class="text-xs text-gray-500">dia inteiro</div>
+                                </label>
+                            </div>
+                            <div class="work-type-option">
+                                <input type="radio" id="work-type-saturday" name="work-type" value="saturday">
+                                <label for="work-type-saturday" class="work-type-label">
+                                    <i data-feather="moon" class="w-5 h-5 mx-auto mb-1"></i>
+                                    <div>Sábado</div>
+                                    <div class="text-xs text-gray-500">não trabalhado</div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração para Trabalho com Almoço -->
+                    <div id="lunch-hours-group" class="hours-config-group lunch-hours-group">
+                        <label for="lunch-hours">Horas de Almoço (descontar)</label>
+                        <div class="hours-input-wrapper">
+                            <select id="lunch-hours" class="hours-select">
+                                <option value="0.5">0.5 hora</option>
+                                <option value="1">1 hora</option>
+                                <option value="1.5">1.5 horas</option>
+                                <option value="2" selected>2 horas</option>
+                                <option value="2.5">2.5 horas</option>
+                                <option value="3">3 horas</option>
+                            </select>
+                            <span class="text-gray-600 text-sm">serão descontadas</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração para Folga -->
+                    <div id="dayoff-hours-group" class="hours-config-group dayoff-hours-group hidden">
+                        <label for="dayoff-hours">Horas da Folga</label>
+                        <div class="hours-input-wrapper">
+                            <select id="dayoff-hours" class="hours-select">
+                                <option value="4">4 horas (meio período)</option>
+                                <option value="6">6 horas</option>
+                                <option value="8" selected>8 horas (dia inteiro)</option>
+                                <option value="10">10 horas</option>
+                                <option value="12">12 horas</option>
+                            </select>
+                            <span class="text-gray-600 text-sm">serão descontadas</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Configuração para Sábado não Trabalhado -->
+                    <div id="saturday-off-group" class="hours-config-group saturday-off-group hidden">
+                        <label>Sábado não trabalhado</label>
+                        <div class="mt-2 p-3 bg-purple-50 rounded-lg">
+                            <div class="flex items-center gap-2">
+                                <i data-feather="info" class="text-purple-600 w-4 h-4"></i>
+                                <span class="text-purple-700 font-medium">Desconto fixo de 4 horas</span>
+                            </div>
+                            <p class="text-sm text-gray-600 mt-1">Quando não se trabalha no sábado, são descontadas 4 horas das horas extras.</p>
+                            <input type="hidden" id="saturday-hours" value="4">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="day-comment">Observação (opcional) - Aplicada a todas as pessoas selecionadas</label>
+                        <textarea id="day-comment" class="w-full h-24 p-3 border border-gray-300 rounded-lg" 
+                                  placeholder="Ex: Dia de consulta médica, Compensação de hora extra, Sábado compensado..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 mt-6">
+                    <button id="clear-day-config" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
+                        Limpar Dia
+                    </button>
+                    <button id="cancel-person-config" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100">
+                        Cancelar
+                    </button>
+                    <button id="save-person-config" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                        Salvar para Todas Selecionadas
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer Component -->
+    <script>
+        class CustomFooter extends HTMLElement {
+            connectedCallback() {
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        footer {
+                            background-color: #1e1b4b;
+                            color: white;
+                            padding: 2rem 1rem;
+                            margin-top: 3rem;
+                        }
+                        .container {
+                            max-width: 1400px;
+                            margin: 0 auto;
+                            display: grid;
+                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                            gap: 2rem;
+                        }
+                        .footer-section h3 {
+                            font-size: 1.2rem;
+                            margin-bottom: 1rem;
+                            color: #a5b4fc;
+                        }
+                        .footer-section ul {
+                            list-style: none;
+                            padding: 0;
+                        }
+                        .footer-section li {
+                            margin-bottom: 0.5rem;
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                        }
+                        .footer-section a {
+                            color: #e0e7ff;
+                            text-decoration: none;
+                            transition: color 0.2s;
+                        }
+                        .footer-section a:hover {
+                            color: white;
+                        }
+                        .copyright {
+                            text-align: center;
+                            margin-top: 2rem;
+                            padding-top: 1rem;
+                            border-top: 1px solid #4f46e5;
+                            color: #a5b4fc;
+                        }
+                        .instructions {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            text-align: center;
+                            font-size: 0.9rem;
+                            line-height: 1.6;
+                        }
+                        .legend-item {
+                            display: flex;
+                            align-items: center;
+                            gap: 0.5rem;
+                            margin-bottom: 0.5rem;
+                        }
+                        .legend-color {
+                            width: 16px;
+                            height: 16px;
+                            border-radius: 4px;
+                        }
+                        .legend-grid {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+                            gap: 0.5rem;
+                        }
+                        @media (max-width: 768px) {
+                            .container {
+                                grid-template-columns: 1fr;
+                            }
+                            .legend-grid {
+                                grid-template-columns: 1fr;
+                            }
+                        }
+                    </style>
+                    <footer>
+                        <div class="container">
+                            <div class="footer-section">
+                                <h3>Calculadora de Horas</h3>
+                                <p>Reduza horas extras de forma inteligente para até 10 pessoas</p>
+                            </div>
+                            <div class="footer-section">
+                                <h3>Como usar</h3>
+                                <div class="instructions">
+                                    <p>1. Digite as horas extras totais para cada pessoa</p>
+                                    <p>2. Clique nos dias para configurar os tipos de redução para uma ou mais pessoas</p>
+                                    <p>3. Calcule o saldo restante de todas as pessoas</p>
+                                </div>
+                            </div>
+                            <div class="footer-section">
+                                <h3>Legenda das Pessoas</h3>
+                                <div class="legend-grid">
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #3b82f6"></div>
+                                        <span>Pessoa 1</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #10b981"></div>
+                                        <span>Pessoa 2</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #f59e0b"></div>
+                                        <span>Pessoa 3</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #ef4444"></div>
+                                        <span>Pessoa 4</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #8b5cf6"></div>
+                                        <span>Pessoa 5</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #ec4899"></div>
+                                        <span>Pessoa 6</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #06b6d4"></div>
+                                        <span>Pessoa 7</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #84cc16"></div>
+                                        <span>Pessoa 8</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #f97316"></div>
+                                        <span>Pessoa 9</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <div class="legend-color" style="background-color: #64748b"></div>
+                                        <span>Pessoa 10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="copyright">
+                            &copy; ${new Date().getFullYear()} Calculadora de Redução de Horas Extras por Jonathan Pittella. Todos os dados são salvos localmente | Direitos de criação reservados.
+                        </div>
+                    </footer>
+                `;
+            }
+        }
+        customElements.define('custom-footer', CustomFooter);
+    </script>
+
+    <custom-footer></custom-footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuração inicial
+            const monthsPTBR = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            
+            let currentDate = new Date();
+            let currentMonth = currentDate.getMonth();
+            let currentYear = currentDate.getFullYear();
+            
+            // Elementos do DOM
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearElement = document.getElementById('current-month-year');
+            const prevMonthBtn = document.getElementById('prev-month');
+            const nextMonthBtn = document.getElementById('next-month');
+            const todayBtn = document.getElementById('today-btn');
+            const resetBtn = document.getElementById('reset-all-btn');
+            const personInputsContainer = document.getElementById('person-inputs-container');
+            const resultsList = document.getElementById('results-list');
+            const personCheckboxContainer = document.getElementById('person-checkbox-container');
+            
+            // Dados das pessoas - AGORA COM 10 PESSOAS
+            let peopleData = {};
+            
+            // Inicializar 10 pessoas
+            for (let i = 1; i <= 10; i++) {
+                peopleData[`person${i}`] = {
+                    name: `Pessoa ${i}`,
+                    initialHours: 0,
+                    usedHours: 0,
+                    days: {}
+                };
+            }
+            
+            // Variável para armazenar o dia atualmente selecionado
+            let currentSelectedDate = null;
+            
+            // Carregar dados salvos
+            const savedData = localStorage.getItem('hoursReducerData10');
+            if (savedData) {
+                peopleData = JSON.parse(savedData);
+            }
+            
+            // Inicializar funcionalidades
+            initializeFeatures();
+            
+            // Funções principais
+            function generateCalendar(month, year) {
+                calendarGrid.innerHTML = '';
+                
+                const firstDay = new Date(year, month, 1);
+                const lastDay = new Date(year, month + 1, 0);
+                const daysInMonth = lastDay.getDate();
+                const startingDay = firstDay.getDay();
+                
+                monthYearElement.textContent = `${monthsPTBR[month]} ${year}`;
+                
+                // Dias vazios no início
+                for (let i = 0; i < startingDay; i++) {
+                    const emptyDay = document.createElement('div');
+                    emptyDay.className = 'calendar-day empty';
+                    calendarGrid.appendChild(emptyDay);
+                }
+                
+                // Dias do mês
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dateStr = `${year}-${month + 1}-${day}`;
+                    const date = new Date(year, month, day);
+                    const isToday = isSameDay(date, new Date());
+                    
+                    const dayElement = document.createElement('div');
+                    dayElement.className = `calendar-day ${isToday ? 'today' : ''}`;
+                    
+                    const dayNumber = document.createElement('div');
+                    dayNumber.className = 'day-number';
+                    dayNumber.textContent = day;
+                    
+                    // Adicionar informações de todas as pessoas configuradas para este dia
+                    const dayConfigs = getDayConfigs(dateStr);
+                    if (dayConfigs.length > 0) {
+                        const infoContainer = document.createElement('div');
+                        infoContainer.className = 'mt-2';
+                        
+                        // Limitar a mostrar 3 configurações para não sobrecarregar
+                        const configsToShow = dayConfigs.slice(0, 3);
+                        
+                        configsToShow.forEach(dayData => {
+                            const infoDiv = document.createElement('div');
+                            infoDiv.className = 'day-info mb-1';
+                            
+                            const personDot = document.createElement('span');
+                            personDot.className = `person-indicator person-${dayData.person}`;
+                            infoDiv.appendChild(personDot);
+                            
+                            const personName = peopleData[`person${dayData.person}`]?.name || `Pessoa ${dayData.person}`;
+                            
+                            let typeText = '';
+                            let typeClass = '';
+                            if (dayData.type === 'dayoff') {
+                                typeClass = 'dayoff-day';
+                                typeText = 'Folga';
+                            } else if (dayData.type === 'saturday') {
+                                typeClass = 'saturday-off-day';
+                                typeText = 'Sábado';
+                            } else {
+                                typeClass = 'worked-day';
+                                typeText = 'Almoço';
+                            }
+                            
+                            infoDiv.classList.add(typeClass);
+                            
+                            // Nome abreviado para caber melhor
+                            const shortName = personName.length > 8 ? personName.substring(0, 8) + '...' : personName;
+                            const nameSpan = document.createElement('span');
+                            nameSpan.textContent = `${shortName}: ${dayData.hours}h`;
+                            nameSpan.style.fontSize = '0.65rem';
+                            infoDiv.appendChild(nameSpan);
+                            
+                            // Tooltip com informações completas
+                            infoDiv.title = `${personName}: ${typeText} - ${dayData.hours} horas\n${dayData.comment || 'Sem observação'}`;
+                            
+                            infoContainer.appendChild(infoDiv);
+                        });
+                        
+                        // Se houver mais configurações, mostrar um indicador
+                        if (dayConfigs.length > 3) {
+                            const moreIndicator = document.createElement('div');
+                            moreIndicator.className = 'day-info mb-1 bg-gray-100 text-gray-600';
+                            moreIndicator.textContent = `+${dayConfigs.length - 3} mais`;
+                            moreIndicator.style.fontSize = '0.6rem';
+                            moreIndicator.style.textAlign = 'center';
+                            moreIndicator.title = `Mais ${dayConfigs.length - 3} pessoas configuradas neste dia`;
+                            infoContainer.appendChild(moreIndicator);
+                        }
+                        
+                        dayElement.appendChild(infoContainer);
+                    }
+                    
+                    const addBtn = document.createElement('div');
+                    addBtn.className = 'add-comment-btn';
+                    addBtn.innerHTML = '<i data-feather="edit-2"></i>';
+                    addBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openPersonModal(dateStr, day, month, year);
+                    });
+                    
+                    dayElement.addEventListener('click', () => {
+                        openPersonModal(dateStr, day, month, year);
+                    });
+                    
+                    dayElement.appendChild(dayNumber);
+                    dayElement.appendChild(addBtn);
+                    
+                    calendarGrid.appendChild(dayElement);
+                }
+                
+                feather.replace();
+            }
+            
+            function isSameDay(date1, date2) {
+                return date1.getFullYear() === date2.getFullYear() &&
+                       date1.getMonth() === date2.getMonth() &&
+                       date1.getDate() === date2.getDate();
+            }
+            
+            function initializeFeatures() {
+                // Gerar campos de input para 10 pessoas
+                generatePersonInputs();
+                
+                // Gerar checkboxes para seleção múltipla
+                generatePersonCheckboxes();
+                
+                // Configurar eventos
+                document.getElementById('calculate-hours').addEventListener('click', calculateBalance);
+                document.getElementById('close-person-modal').addEventListener('click', closePersonModal);
+                document.getElementById('cancel-person-config').addEventListener('click', closePersonModal);
+                document.getElementById('save-person-config').addEventListener('click', savePersonConfig);
+                document.getElementById('clear-day-config').addEventListener('click', clearDayConfig);
+                resetBtn.addEventListener('click', resetAllData);
+                
+                // Alternar entre tipo trabalho/folga/sábado
+                document.querySelectorAll('input[name="work-type"]').forEach(radio => {
+                    radio.addEventListener('change', toggleWorkType);
+                });
+                
+                // Atualizar contador quando checkboxes mudam
+                personCheckboxContainer.addEventListener('change', updateSelectedCount);
+                
+                // Calcular horas usadas
+                calculateUsedHours();
+            }
+            
+            function generatePersonInputs() {
+                personInputsContainer.innerHTML = '';
+                
+                for (let i = 1; i <= 10; i++) {
+                    const personCard = document.createElement('div');
+                    personCard.className = 'person-card';
+                    personCard.innerHTML = `
+                        <label for="person-${i}-name">Pessoa ${i}</label>
+                        <input type="text" id="person-${i}-name" class="person-input" 
+                               placeholder="Nome da Pessoa ${i}" 
+                               value="${peopleData[`person${i}`]?.name || `Pessoa ${i}`}">
+                        <div class="hours-input">
+                            <label>Horas Extras Disponíveis</label>
+                            <div class="input-wrapper">
+                                <input type="number" id="person-${i}-hours" min="0" step="0.5" 
+                                       value="${peopleData[`person${i}`]?.initialHours || 0}" 
+                                       placeholder="0">
+                                <span>horas</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    personInputsContainer.appendChild(personCard);
+                    
+                    // Adicionar event listeners
+                    document.getElementById(`person-${i}-name`).addEventListener('change', () => updatePersonData(i));
+                    document.getElementById(`person-${i}-hours`).addEventListener('change', () => updatePersonData(i));
+                }
+            }
+            
+            function generatePersonCheckboxes() {
+                personCheckboxContainer.innerHTML = '';
+                
+                for (let i = 1; i <= 10; i++) {
+                    const personName = peopleData[`person${i}`]?.name || `Pessoa ${i}`;
+                    
+                    const checkboxItem = document.createElement('div');
+                    checkboxItem.className = 'person-checkbox-item';
+                    checkboxItem.innerHTML = `
+                        <input type="checkbox" id="person-checkbox-${i}" value="${i}" class="person-checkbox">
+                        <label for="person-checkbox-${i}" class="person-checkbox-label">
+                            <span class="person-color-indicator person-${i}"></span>
+                            <span>${personName}</span>
+                        </label>
+                    `;
+                    
+                    personCheckboxContainer.appendChild(checkboxItem);
+                }
+            }
+            
+            function updateSelectedCount() {
+                const selectedCheckboxes = document.querySelectorAll('.person-checkbox:checked');
+                const selectedCount = selectedCheckboxes.length;
+                document.getElementById('selected-count').textContent = selectedCount;
+                
+                // Atualizar texto do botão de salvar
+                const saveButton = document.getElementById('save-person-config');
+                if (selectedCount === 0) {
+                    saveButton.disabled = true;
+                    saveButton.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    saveButton.disabled = false;
+                    saveButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+            
+            function updatePersonData(personNumber) {
+                const name = document.getElementById(`person-${personNumber}-name`).value;
+                const hours = parseFloat(document.getElementById(`person-${personNumber}-hours`).value) || 0;
+                
+                peopleData[`person${personNumber}`].name = name;
+                peopleData[`person${personNumber}`].initialHours = hours;
+                
+                // Atualizar checkbox
+                const checkboxLabel = document.querySelector(`label[for="person-checkbox-${personNumber}"] span:nth-child(2)`);
+                if (checkboxLabel) {
+                    checkboxLabel.textContent = name;
+                }
+                
+                saveData();
+                generateCalendar(currentMonth, currentYear);
+            }
+            
+            function openPersonModal(dateString, day, month, year) {
+                currentSelectedDate = dateString;
+                const modal = document.getElementById('person-modal');
+                const title = document.getElementById('person-modal-title');
+                
+                const date = new Date(dateString);
+                const isSaturday = date.getDay() === 6;
+                const formattedDate = date.toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long'
+                });
+                
+                title.textContent = `Configurar ${formattedDate}`;
+                
+                // Limpar todas as checkboxes primeiro
+                document.querySelectorAll('.person-checkbox').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Carregar configurações existentes para este dia
+                const dayConfigs = getDayConfigs(dateString);
+                
+                // Preencher as checkboxes das pessoas que já têm configuração neste dia
+                dayConfigs.forEach(dayData => {
+                    const checkbox = document.getElementById(`person-checkbox-${dayData.person}`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                        
+                        // Se todas as configurações forem iguais, preencher o formulário
+                        if (dayConfigs.length > 0) {
+                            const firstConfig = dayConfigs[0];
+                            if (dayData.type === firstConfig.type && dayData.hours === firstConfig.hours) {
+                                // Selecionar o tipo correto baseado nos dados salvos
+                                if (firstConfig.type === 'dayoff') {
+                                    document.getElementById('work-type-dayoff').checked = true;
+                                    document.getElementById('dayoff-hours').value = firstConfig.hours;
+                                } else if (firstConfig.type === 'saturday') {
+                                    document.getElementById('work-type-saturday').checked = true;
+                                } else {
+                                    document.getElementById('work-type-normal').checked = true;
+                                    document.getElementById('lunch-hours').value = firstConfig.hours;
+                                }
+                                
+                                // Usar a primeira observação encontrada
+                                document.getElementById('day-comment').value = firstConfig.comment || '';
+                            }
+                        }
+                    }
+                });
+                
+                // Se não houver configurações, usar valores padrão
+                if (dayConfigs.length === 0) {
+                    // Se for sábado, selecionar automaticamente "Sábado não trabalhado"
+                    if (isSaturday) {
+                        document.getElementById('work-type-saturday').checked = true;
+                    } else {
+                        document.getElementById('work-type-normal').checked = true;
+                    }
+                    
+                    document.getElementById('lunch-hours').value = '2';
+                    document.getElementById('dayoff-hours').value = '8';
+                    document.getElementById('day-comment').value = '';
+                }
+                
+                updateSelectedCount();
+                toggleWorkType();
+                modal.classList.remove('hidden');
+            }
+            
+            function toggleWorkType() {
+                const lunchGroup = document.getElementById('lunch-hours-group');
+                const dayoffGroup = document.getElementById('dayoff-hours-group');
+                const saturdayGroup = document.getElementById('saturday-off-group');
+                
+                // Esconder todos os grupos primeiro
+                lunchGroup.classList.add('hidden');
+                dayoffGroup.classList.add('hidden');
+                saturdayGroup.classList.add('hidden');
+                
+                // Mostrar apenas o grupo correspondente ao tipo selecionado
+                if (document.getElementById('work-type-dayoff').checked) {
+                    dayoffGroup.classList.remove('hidden');
+                } else if (document.getElementById('work-type-saturday').checked) {
+                    saturdayGroup.classList.remove('hidden');
+                } else {
+                    lunchGroup.classList.remove('hidden');
+                }
+            }
+            
+            function closePersonModal() {
+                document.getElementById('person-modal').classList.add('hidden');
+            }
+            
+            function clearDayConfig() {
+                if (!currentSelectedDate || !confirm('Tem certeza que deseja remover todas as configurações deste dia para todas as pessoas?')) {
+                    return;
+                }
+                
+                // Remover configurações deste dia para todas as pessoas
+                for (let i = 1; i <= 10; i++) {
+                    if (peopleData[`person${i}`].days[currentSelectedDate]) {
+                        delete peopleData[`person${i}`].days[currentSelectedDate];
+                    }
+                }
+                
+                // Recalcular horas usadas
+                calculateUsedHours();
+                
+                // Atualizar calendário
+                generateCalendar(currentMonth, currentYear);
+                
+                // Fechar modal
+                closePersonModal();
+                
+                // Salvar dados
+                saveData();
+            }
+            
+            function savePersonConfig() {
+                if (!currentSelectedDate) return;
+                
+                const selectedCheckboxes = document.querySelectorAll('.person-checkbox:checked');
+                if (selectedCheckboxes.length === 0) {
+                    alert('Por favor, selecione pelo menos uma pessoa.');
+                    return;
+                }
+                
+                const isDayoff = document.getElementById('work-type-dayoff').checked;
+                const isSaturday = document.getElementById('work-type-saturday').checked;
+                let hours = 0;
+                let type = 'normal';
+                
+                // Definir horas e tipo baseado na seleção
+                if (isDayoff) {
+                    hours = parseFloat(document.getElementById('dayoff-hours').value);
+                    type = 'dayoff';
+                } else if (isSaturday) {
+                    hours = 4; // Valor fixo para sábado não trabalhado
+                    type = 'saturday';
+                } else {
+                    hours = parseFloat(document.getElementById('lunch-hours').value);
+                    type = 'normal';
+                }
+                
+                const comment = document.getElementById('day-comment').value.trim();
+                
+                // Aplicar configuração a todas as pessoas selecionadas
+                selectedCheckboxes.forEach(checkbox => {
+                    const personNumber = checkbox.value;
+                    
+                    // Remover configuração existente para este dia (se houver)
+                    if (peopleData[`person${personNumber}`].days[currentSelectedDate]) {
+                        delete peopleData[`person${personNumber}`].days[currentSelectedDate];
+                    }
+                    
+                    // Adicionar nova configuração
+                    peopleData[`person${personNumber}`].days[currentSelectedDate] = {
+                        date: currentSelectedDate,
+                        person: personNumber,
+                        type: type,
+                        hours: hours,
+                        comment: comment
+                    };
+                });
+                
+                // Recalcular horas usadas
+                calculateUsedHours();
+                
+                // Atualizar calendário
+                generateCalendar(currentMonth, currentYear);
+                
+                // Fechar modal
+                closePersonModal();
+                
+                // Salvar dados
+                saveData();
+            }
+            
+            function calculateUsedHours() {
+                // Resetar horas usadas para todas as pessoas
+                for (let i = 1; i <= 10; i++) {
+                    peopleData[`person${i}`].usedHours = 0;
+                }
+                
+                // Calcular horas usadas para cada pessoa
+                for (let i = 1; i <= 10; i++) {
+                    Object.values(peopleData[`person${i}`].days).forEach(day => {
+                        peopleData[`person${i}`].usedHours += day.hours;
+                    });
+                }
+            }
+            
+            function getDayConfigs(dateString) {
+                // Retorna TODAS as configurações para o dia (pode ter várias pessoas)
+                const configs = [];
+                for (let i = 1; i <= 10; i++) {
+                    if (peopleData[`person${i}`].days[dateString]) {
+                        configs.push(peopleData[`person${i}`].days[dateString]);
+                    }
+                }
+                return configs;
+            }
+            
+            function calculateBalance() {
+                const resultsContainer = document.getElementById('results-container');
+                resultsList.innerHTML = '';
+                
+                let totalRemaining = 0;
+                let allZero = true;
+                let anyPositive = false;
+                
+                // Calcular saldo para cada pessoa
+                for (let i = 1; i <= 10; i++) {
+                    const personName = peopleData[`person${i}`].name;
+                    const balance = peopleData[`person${i}`].initialHours - peopleData[`person${i}`].usedHours;
+                    
+                    totalRemaining += Math.max(0, balance);
+                    
+                    if (balance > 0) {
+                        anyPositive = true;
+                        allZero = false;
+                    } else if (balance < 0) {
+                        allZero = false;
+                    }
+                    
+                    // Criar elemento de resultado
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    
+                    const resultLabel = document.createElement('span');
+                    resultLabel.className = 'result-label';
+                    resultLabel.textContent = `${personName}:`;
+                    
+                    const resultValue = document.createElement('span');
+                    resultValue.className = 'result-value';
+                    resultValue.textContent = `${balance >= 0 ? '+' : ''}${balance.toFixed(1)}h`;
+                    
+                    // Aplicar cor baseada no saldo
+                    if (balance > 0) {
+                        resultValue.classList.add('negative');
+                        resultValue.title = `Ainda precisa reduzir ${balance.toFixed(1)} horas`;
+                    } else if (balance < 0) {
+                        resultValue.classList.add('positive');
+                        resultValue.title = `Reduziu ${Math.abs(balance).toFixed(1)} horas a mais`;
+                    } else {
+                        resultValue.classList.add('neutral');
+                        resultValue.title = 'Horas extras zeradas';
+                    }
+                    
+                    resultItem.appendChild(resultLabel);
+                    resultItem.appendChild(resultValue);
+                    resultsList.appendChild(resultItem);
+                }
+                
+                // Atualizar status geral
+                const statusText = document.getElementById('status-text');
+                const statusIndicator = document.getElementById('status-indicator');
+                
+                if (allZero) {
+                    statusText.textContent = '✓ Todas as pessoas zeraram as horas extras';
+                    statusIndicator.className = 'status-indicator status-working';
+                } else if (!anyPositive) {
+                    statusText.textContent = '✓ Todas reduziram além do necessário';
+                    statusIndicator.className = 'status-indicator status-working';
+                } else {
+                    statusText.textContent = `⏳ Total a reduzir: ${totalRemaining.toFixed(1)} horas`;
+                    statusIndicator.className = 'status-indicator status-dayoff';
+                }
+                
+                // Mostrar resultados
+                resultsContainer.classList.remove('hidden');
+            }
+            
+            function resetAllData() {
+                if (confirm('Tem certeza que deseja resetar TODOS os dados para todas as 10 pessoas?\n\nIsso irá:' +
+                            '\n• Limpar todos os nomes' +
+                            '\n• Zerar todas as horas extras' +
+                            '\n• Remover todas as configurações dos dias' +
+                            '\n• Apagar todo o histórico')) {
+                    
+                    // Resetar dados para 10 pessoas
+                    for (let i = 1; i <= 10; i++) {
+                        peopleData[`person${i}`] = {
+                            name: `Pessoa ${i}`,
+                            initialHours: 0,
+                            usedHours: 0,
+                            days: {}
+                        };
+                    }
+                    
+                    // Atualizar inputs
+                    generatePersonInputs();
+                    
+                    // Atualizar checkboxes
+                    generatePersonCheckboxes();
+                    
+                    // Limpar localStorage
+                    localStorage.removeItem('hoursReducerData10');
+                    
+                    // Esconder resultados
+                    document.getElementById('results-container').classList.add('hidden');
+                    
+                    // Recalcular horas usadas
+                    calculateUsedHours();
+                    
+                    // Atualizar calendário
+                    generateCalendar(currentMonth, currentYear);
+                    
+                    // Atualizar ícones
+                    feather.replace();
+                    
+                    // Mostrar feedback
+                    alert('✅ Todos os dados foram resetados com sucesso para todas as 10 pessoas!');
+                }
+            }
+            
+            function saveData() {
+                localStorage.setItem('hoursReducerData10', JSON.stringify(peopleData));
+            }
+            
+            // Event Listeners para calendário
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth--;
+                if (currentMonth < 0) {
+                    currentMonth = 11;
+                    currentYear--;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth++;
+                if (currentMonth > 11) {
+                    currentMonth = 0;
+                    currentYear++;
+                }
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            todayBtn.addEventListener('click', () => {
+                currentDate = new Date();
+                currentMonth = currentDate.getMonth();
+                currentYear = currentDate.getFullYear();
+                generateCalendar(currentMonth, currentYear);
+            });
+            
+            // Fechar modal ao clicar fora
+            document.getElementById('person-modal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('person-modal')) {
+                    closePersonModal();
+                }
+            });
+            
+            // Inicializar calendário
+            generateCalendar(currentMonth, currentYear);
+            
+            // Inicializar feather icons
+            feather.replace();
+        });
+    </script>
+</body>
+</html>
