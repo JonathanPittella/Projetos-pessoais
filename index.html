@@ -219,10 +219,10 @@
         }
 
         .positive {
-            color: #ef4444;  /* Vermelho - (Ainda tem horas positivas) */
+            color: #10b981;  /* Verde - Sucesso (reduziu além do necessário) */
         }
         .negative {
-            color: #10b981;  /* verde - (ainda precisa reduzir) */
+            color: #ef4444;  /* Vermelho - Alerta (ainda precisa reduzir) */
         }
         .neutral {
             color: #3b82f6;  /* Azul - Neutro (zerou exatamente) */
@@ -248,6 +248,31 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3);
             background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        /* Botão Adicionar Todas */
+        .add-all-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2);
+            margin-bottom: 1rem;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .add-all-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
         }
 
         /* Modal de configuração de pessoa - MODIFICADO para múltiplas pessoas */
@@ -455,6 +480,12 @@
             color: #6b21a8;
         }
 
+        /* Novo estilo para dia sem desconto */
+        .no-discount-day {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
         /* Contador de pessoas selecionadas */
         .selected-count {
             display: inline-block;
@@ -464,6 +495,39 @@
             padding: 0.125rem 0.375rem;
             border-radius: 9999px;
             margin-left: 0.5rem;
+        }
+
+        /* Botões de seleção rápida */
+        .quick-selection-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-select-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            background-color: white;
+            color: #4b5563;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .quick-select-btn:hover {
+            background-color: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .quick-select-btn.active {
+            background-color: #e0e7ff;
+            border-color: #6366f1;
+            color: #4f46e5;
         }
 
         /* Animações */
@@ -734,6 +798,27 @@
                 <div class="config-form">
                     <div class="form-group">
                         <label>Selecionar Pessoas <span id="selected-count" class="selected-count">0</span></label>
+                        
+                        <!-- Botões de seleção rápida -->
+                        <div class="quick-selection-buttons">
+                            <button id="select-all-btn" class="quick-select-btn">
+                                <i data-feather="users" class="w-4 h-4 mr-1"></i>
+                                Todas (10)
+                            </button>
+                            <button id="select-none-btn" class="quick-select-btn">
+                                <i data-feather="user-x" class="w-4 h-4 mr-1"></i>
+                                Nenhuma
+                            </button>
+                            <button id="select-odd-btn" class="quick-select-btn">
+                                <i data-feather="filter" class="w-4 h-4 mr-1"></i>
+                                Ímpares (1,3,5,7,9)
+                            </button>
+                            <button id="select-even-btn" class="quick-select-btn">
+                                <i data-feather="filter" class="w-4 h-4 mr-1"></i>
+                                Pares (2,4,6,8,10)
+                            </button>
+                        </div>
+                        
                         <div class="person-selection-container">
                             <div class="person-checkbox-group" id="person-checkbox-container">
                                 <!-- As checkboxes serão geradas dinamicamente -->
@@ -772,11 +857,12 @@
                         </div>
                     </div>
                     
-                    <!-- Configuração para Trabalho com Almoço -->
+                    <!-- Configuração para Trabalho com Almoço - MODIFICADO com opção 0 horas -->
                     <div id="lunch-hours-group" class="hours-config-group lunch-hours-group">
                         <label for="lunch-hours">Horas de Almoço (descontar)</label>
                         <div class="hours-input-wrapper">
                             <select id="lunch-hours" class="hours-select">
+                                <option value="0">0 horas (sem desconto)</option>
                                 <option value="0.5">0.5 hora</option>
                                 <option value="1">1 hora</option>
                                 <option value="1.5">1.5 horas</option>
@@ -786,6 +872,10 @@
                             </select>
                             <span class="text-gray-600 text-sm">serão descontadas</span>
                         </div>
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i data-feather="info" class="w-3 h-3 inline mr-1"></i>
+                            Selecione "0 horas" para marcar o dia sem descontar horas extras
+                        </p>
                     </div>
                     
                     <!-- Configuração para Folga -->
@@ -931,7 +1021,9 @@
                                 <div class="instructions">
                                     <p>1. Digite as horas extras totais para cada pessoa</p>
                                     <p>2. Clique nos dias para configurar os tipos de redução para uma ou mais pessoas</p>
-                                    <p>3. Calcule o saldo restante de todas as pessoas</p>
+                                    <p>3. Use os botões de seleção rápida para aplicar a mesma configuração a várias pessoas</p>
+                                    <p>4. Para dias normais sem desconto, selecione "0 horas" no horário de almoço</p>
+                                    <p>5. Calcule o saldo restante de todas as pessoas</p>
                                 </div>
                             </div>
                             <div class="footer-section">
@@ -981,7 +1073,7 @@
                             </div>
                         </div>
                         <div class="copyright">
-                            &copy; ${new Date().getFullYear()} Calculadora de Redução de Horas Extras por Jonathan Pittella. Todos os dados são salvos localmente | Direitos de criação reservados.
+                            &copy; ${new Date().getFullYear()} Calculadora de Redução de Horas Extras. Todos os dados são salvos localmente.
                         </div>
                     </footer>
                 `;
@@ -1099,8 +1191,14 @@
                                 typeClass = 'saturday-off-day';
                                 typeText = 'Sábado';
                             } else {
-                                typeClass = 'worked-day';
-                                typeText = 'Almoço';
+                                // Para dias normais, verificar se é 0 horas
+                                if (dayData.hours === 0) {
+                                    typeClass = 'no-discount-day';
+                                    typeText = 'Sem desconto';
+                                } else {
+                                    typeClass = 'worked-day';
+                                    typeText = 'Almoço';
+                                }
                             }
                             
                             infoDiv.classList.add(typeClass);
@@ -1108,12 +1206,26 @@
                             // Nome abreviado para caber melhor
                             const shortName = personName.length > 8 ? personName.substring(0, 8) + '...' : personName;
                             const nameSpan = document.createElement('span');
-                            nameSpan.textContent = `${shortName}: ${dayData.hours}h`;
+                            
+                            // Texto diferente para 0 horas
+                            if (dayData.type === 'normal' && dayData.hours === 0) {
+                                nameSpan.textContent = `${shortName}: Sem desconto`;
+                            } else {
+                                nameSpan.textContent = `${shortName}: ${dayData.hours}h`;
+                            }
+                            
                             nameSpan.style.fontSize = '0.65rem';
                             infoDiv.appendChild(nameSpan);
                             
                             // Tooltip com informações completas
-                            infoDiv.title = `${personName}: ${typeText} - ${dayData.hours} horas\n${dayData.comment || 'Sem observação'}`;
+                            let tooltipText = `${personName}: ${typeText}`;
+                            if (dayData.type === 'normal' && dayData.hours === 0) {
+                                tooltipText += ' - 0 horas descontadas';
+                            } else {
+                                tooltipText += ` - ${dayData.hours} horas`;
+                            }
+                            tooltipText += `\n${dayData.comment || 'Sem observação'}`;
+                            infoDiv.title = tooltipText;
                             
                             infoContainer.appendChild(infoDiv);
                         });
@@ -1173,6 +1285,12 @@
                 document.getElementById('save-person-config').addEventListener('click', savePersonConfig);
                 document.getElementById('clear-day-config').addEventListener('click', clearDayConfig);
                 resetBtn.addEventListener('click', resetAllData);
+                
+                // Configurar botões de seleção rápida
+                document.getElementById('select-all-btn').addEventListener('click', () => selectAllPeople(true));
+                document.getElementById('select-none-btn').addEventListener('click', () => selectAllPeople(false));
+                document.getElementById('select-odd-btn').addEventListener('click', selectOddPeople);
+                document.getElementById('select-even-btn').addEventListener('click', selectEvenPeople);
                 
                 // Alternar entre tipo trabalho/folga/sábado
                 document.querySelectorAll('input[name="work-type"]').forEach(radio => {
@@ -1236,6 +1354,29 @@
                 }
             }
             
+            function selectAllPeople(select) {
+                document.querySelectorAll('.person-checkbox').forEach(checkbox => {
+                    checkbox.checked = select;
+                });
+                updateSelectedCount();
+            }
+            
+            function selectOddPeople() {
+                document.querySelectorAll('.person-checkbox').forEach(checkbox => {
+                    const personNumber = parseInt(checkbox.value);
+                    checkbox.checked = personNumber % 2 !== 0; // Ímpares: 1, 3, 5, 7, 9
+                });
+                updateSelectedCount();
+            }
+            
+            function selectEvenPeople() {
+                document.querySelectorAll('.person-checkbox').forEach(checkbox => {
+                    const personNumber = parseInt(checkbox.value);
+                    checkbox.checked = personNumber % 2 === 0; // Pares: 2, 4, 6, 8, 10
+                });
+                updateSelectedCount();
+            }
+            
             function updateSelectedCount() {
                 const selectedCheckboxes = document.querySelectorAll('.person-checkbox:checked');
                 const selectedCount = selectedCheckboxes.length;
@@ -1250,6 +1391,23 @@
                     saveButton.disabled = false;
                     saveButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
+                
+                // Atualizar estado dos botões de seleção rápida
+                updateQuickSelectionButtons();
+            }
+            
+            function updateQuickSelectionButtons() {
+                const allCheckboxes = document.querySelectorAll('.person-checkbox');
+                const selectedCheckboxes = document.querySelectorAll('.person-checkbox:checked');
+                
+                // Verificar se todas estão selecionadas
+                const allSelected = selectedCheckboxes.length === allCheckboxes.length;
+                // Verificar se nenhuma está selecionada
+                const noneSelected = selectedCheckboxes.length === 0;
+                
+                // Atualizar botões
+                document.getElementById('select-all-btn').classList.toggle('active', allSelected);
+                document.getElementById('select-none-btn').classList.toggle('active', noneSelected);
             }
             
             function updatePersonData(personNumber) {
@@ -1410,6 +1568,7 @@
                     hours = 4; // Valor fixo para sábado não trabalhado
                     type = 'saturday';
                 } else {
+                    // AQUI: Agora permite 0 horas
                     hours = parseFloat(document.getElementById('lunch-hours').value);
                     type = 'normal';
                 }
@@ -1457,6 +1616,7 @@
                 // Calcular horas usadas para cada pessoa
                 for (let i = 1; i <= 10; i++) {
                     Object.values(peopleData[`person${i}`].days).forEach(day => {
+                        // AQUI: Soma todas as horas configuradas (0 horas não afetam o total)
                         peopleData[`person${i}`].usedHours += day.hours;
                     });
                 }
@@ -1631,5 +1791,4 @@
         });
     </script>
 </body>
-
 </html>
