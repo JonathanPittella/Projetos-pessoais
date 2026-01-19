@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de Simulações - Calculadora de Horas Extras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <style>
+        /* Estilos para o histórico */
+        .history-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .history-header {
+            background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .history-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .history-controls {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .date-range-filter {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: end;
+            margin-bottom: 1rem;
+        }
+        
+        .date-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .date-input-group label {
+            font-weight: 500;
+            color: #4b5563;
+            font-size: 0.875rem;
+        }
+        
+        .date-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background-color: white;
+        }
+        
+        .date-input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .date-separator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-bottom: 0.5rem;
+            color: #6b7280;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .filter-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .apply-filter-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .apply-filter-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+        }
+        
+        .clear-filter-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+        
+        .clear-filter-btn:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+            transform: translateY(-2px);
+        }
+        
+        .history-stats {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .stats-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #4b5563;
+        }
+        
+        .history-list-container {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .history-list-header {
+            padding: 1rem;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            font-weight: 600;
+            color: #4b5563;
+        }
+        
+        .history-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr auto;
+            gap: 1rem;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        
+        .history-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-weight: 500;
+            color: #4b5563;
+        }
+        
+        .history-time {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .history-total {
+            font-weight: 600;
+        }
+        
+        .history-total.positive {
+            color: #10b981;
+        }
+        
+        .history-total.negative {
+            color: #ef4444;
+        }
+        
+        .history-total.neutral {
+            color: #3b82f6;
+        }
+        
+        .history-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-over {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+        
+        .delete-btn:hover {
+            background-color: #fee2e2;
+        }
+        
+        .no-history {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #9ca3af;
+        }
+        
+        .no-history i {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+        }
+        
+        .export-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+        
+        .export-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+        
+        .export-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            transform: translateY(-2px);
+        }
+        
+        /* Estilos para o calendário do flatpickr */
+        .flatpickr-calendar {
+            font-family: inherit;
+        }
+        
+        /* Scrollbar personalizada */
+        .history-list::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .history-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .history-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .history-list::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        @media (max-width: 768px) {
+            .date-range-filter {
+                grid-template-columns: 1fr;
+            }
+            
+            .date-separator {
+                display: none;
+            }
+            
+            .history-list-header,
+            .history-item {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+            
+            .filter-actions,
+            .export-actions {
+                flex-direction: column;
+            }
+            
+            .filter-btn,
+            .export-btn,
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="history-container">
+        <!-- Cabeçalho -->
+        <div class="history-header">
+            <div class="history-title">
+                <i data-feather="history"></i>
+                Histórico Completo de Simulações
+            </div>
+            <a href="Calendário10.html" class="back-btn">
+                <i data-feather="arrow-left"></i>
+                Voltar para Calculadora
+            </a>
+        </div>
+        
+        <!-- Filtros -->
+        <div class="history-controls">
+            <div class="date-range-filter">
+                <div class="date-input-group">
+                    <label for="start-date">Data Inicial</label>
+                    <input type="text" id="start-date" class="date-input" placeholder="DD/MM/AAAA">
+                </div>
+                
+                <div class="date-separator">
+                    <span>até</span>
+                </div>
+                
+                <div class="date-input-group">
+                    <label for="end-date">Data Final</label>
+                    <input type="text" id="end-date" class="date-input" placeholder="DD/MM/AAAA">
+                </div>
+            </div>
+            
+            <div class="filter-actions">
+                <button id="apply-filter-btn" class="filter-btn apply-filter-btn">
+                    <i data-feather="filter"></i>
+                    Aplicar Filtro
+                </button>
+                <button id="clear-filter-btn" class="filter-btn clear-filter-btn">
+                    <i data-feather="x"></i>
+                    Limpar Filtro
+                </button>
+            </div>
+        </div>
+        
+        <!-- Estatísticas -->
+        <div id="history-stats" class="history-stats">
+            <div class="stats-item">
+                <i data-feather="bar-chart"></i>
+                <span id="total-simulations">0 simulações</span>
+            </div>
+            <div class="stats-item">
+                <i data-feather="calendar"></i>
+                <span id="date-range">Período: Todos os dias</span>
+            </div>
+        </div>
+        
+        <!-- Lista de Histórico -->
+        <div class="history-list-container">
+            <div class="history-list-header">
+                <span>Data e Hora</span>
+                <span>Total Horas</span>
+                <span>Saldo</span>
+                <span>Status</span>
+                <span>Ações</span>
+            </div>
+            
+            <div id="history-list" class="history-list">
+                <!-- Histórico será carregado aqui -->
+            </div>
+            
+            <div id="no-history" class="no-history">
+                <i data-feather="clock"></i>
+                <h3 class="text-lg font-medium mb-2">Nenhuma simulação encontrada</h3>
+                <p>Realize simulações na calculadora para ver o histórico aqui.</p>
+            </div>
+        </div>
+        
+        <!-- Ações -->
+        <div class="export-actions">
+            <button id="export-history-btn" class="export-btn">
+                <i data-feather="download"></i>
+                Exportar Histórico (JSON)
+            </button>
+            <button id="clear-all-btn" class="export-btn" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                <i data-feather="trash-2"></i>
+                Limpar Todo Histórico
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let simulationHistory = [];
+        let filteredHistory = [];
+        let startDate = null;
+        let endDate = null;
+        
+        // Inicializar quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar histórico do localStorage
+            loadHistory();
+            
+            // Inicializar datepickers
+            initializeDatepickers();
+            
+            // Configurar eventos
+            setupEventListeners();
+            
+            // Carregar histórico inicial
+            updateHistoryDisplay();
+        });
+        
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('hoursReducerHistory');
+            if (savedHistory) {
+                simulationHistory = JSON.parse(savedHistory);
+                // Garantir que cada item tenha a data como objeto Date
+                simulationHistory.forEach(sim => {
+                    sim.dateObj = new Date(sim.date);
+                });
+            }
+        }
+        
+        function initializeDatepickers() {
+            // Configurar flatpickr com localização brasileira
+            flatpickr.localize(flatpickr.l10ns.pt);
+            
+            const dateConfig = {
+                dateFormat: "d/m/Y",
+                locale: "pt",
+                allowInput: true,
+                clickOpens: true,
+                onChange: function(selectedDates, dateStr, instance) {
+                    // Validar manualmente a entrada
+                    validateDateInput(instance);
+                }
+            };
+            
+            // Datepicker para data inicial
+            flatpickr("#start-date", {
+                ...dateConfig,
+                onChange: function(selectedDates) {
+                    startDate = selectedDates[0] || null;
+                    if (startDate && endDate && startDate > endDate) {
+                        // Se data inicial for maior que final, ajustar automaticamente
+                        endDate = startDate;
+                        document.getElementById('end-date').value = formatDate(endDate);
+                    }
+                }
+            });
+            
+            // Datepicker para data final
+            flatpickr("#end-date", {
+                ...dateConfig,
+                onChange: function(selectedDates) {
+                    endDate = selectedDates[0] || null;
+                    if (startDate && endDate && startDate > endDate) {
+                        // Se data final for menor que inicial, ajustar automaticamente
+                        startDate = endDate;
+                        document.getElementById('start-date').value = formatDate(startDate);
+                    }
+                }
+            });
+            
+            // Permitir entrada manual
+            document.getElementById('start-date').addEventListener('blur', function() {
+                validateManualDateInput(this, 'start');
+            });
+            
+            document.getElementById('end-date').addEventListener('blur', function() {
+                validateManualDateInput(this, 'end');
+            });
+        }
+        
+        function validateDateInput(instance) {
+            const input = instance.input;
+            const value = input.value.trim();
+            
+            if (!value) return;
+            
+            // Validar formato DD/MM/AAAA
+            const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+            const match = value.match(regex);
+            
+            if (!match) {
+                input.classList.add('border-red-500');
+                return;
+            }
+            
+            const day = parseInt(match[1]);
+            const month = parseInt(match[2]);
+            const year = parseInt(match[3]);
+            
+            // Validar se é uma data válida
+            const date = new Date(year, month - 1, day);
+            if (date.getFullYear() !== year || 
+                date.getMonth() !== month - 1 || 
+                date.getDate() !== day) {
+                input.classList.add('border-red-500');
+                return;
+            }
+            
+            input.classList.remove('border-red-500');
+        }
+        
+        function validateManualDateInput(input, type) {
+            const value = input.value.trim();
+            
+            if (!value) {
+                if (type === 'start') startDate = null;
+                else endDate = null;
+                return;
+            }
+            
+            // Tentar parsear a data
+            const parts = value.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]);
+                const year = parseInt(parts[2]);
+                
+                const date = new Date(year, month - 1, day);
+                if (date.getFullYear() === year && 
+                    date.getMonth() === month - 1 && 
+                    date.getDate() === day) {
+                    
+                    if (type === 'start') {
+                        startDate = date;
+                        if (endDate && startDate > endDate) {
+                            endDate = startDate;
+                            document.getElementById('end-date').value = formatDate(endDate);
+                        }
+                    } else {
+                        endDate = date;
+                        if (startDate && startDate > endDate) {
+                            startDate = endDate;
+                            document.getElementById('start-date').value = formatDate(startDate);
+                        }
+                    }
+                    
+                    input.classList.remove('border-red-500');
+                    return;
+                }
+            }
+            
+            // Data inválida
+            input.classList.add('border-red-500');
+            alert('Por favor, insira uma data válida no formato DD/MM/AAAA');
+        }
+        
+        function formatDate(date) {
+            if (!date) return '';
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        
+        function setupEventListeners() {
+            // Aplicar filtro
+            document.getElementById('apply-filter-btn').addEventListener('click', applyDateFilter);
+            
+            // Limpar filtro
+            document.getElementById('clear-filter-btn').addEventListener('click', clearDateFilter);
+            
+            // Exportar histórico
+            document.getElementById('export-history-btn').addEventListener('click', exportHistory);
+            
+            // Limpar todo o histórico
+            document.getElementById('clear-all-btn').addEventListener('click', clearAllHistory);
+            
+            // Permitir Enter nos campos de data
+            document.getElementById('start-date').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') applyDateFilter();
+            });
+            
+            document.getElementById('end-date').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') applyDateFilter();
+            });
+        }
+        
+        function applyDateFilter() {
+            // Se apenas uma data for preenchida, usar como ambas
+            if (startDate && !endDate) {
+                endDate = startDate;
+                document.getElementById('end-date').value = formatDate(endDate);
+            } else if (!startDate && endDate) {
+                startDate = endDate;
+                document.getElementById('start-date').value = formatDate(startDate);
+            }
+            
+            updateHistoryDisplay();
+        }
+        
+        function clearDateFilter() {
+            startDate = null;
+            endDate = null;
+            document.getElementById('start-date').value = '';
+            document.getElementById('end-date').value = '';
+            updateHistoryDisplay();
+        }
+        
+        function updateHistoryDisplay() {
+            const historyList = document.getElementById('history-list');
+            const noHistoryElement = document.getElementById('no-history');
+            const totalSimulationsElement = document.getElementById('total-simulations');
+            const dateRangeElement = document.getElementById('date-range');
+            
+            // Filtrar histórico por data
+            if (startDate && endDate) {
+                // Normalizar datas para comparar apenas dia/mês/ano
+                const normalizedStart = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+                const normalizedEnd = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 23, 59, 59);
+                
+                filteredHistory = simulationHistory.filter(sim => {
+                    const simDate = new Date(sim.date);
+                    return simDate >= normalizedStart && simDate <= normalizedEnd;
+                });
+            } else {
+                filteredHistory = [...simulationHistory];
+            }
+            
+            // Ordenar por data (mais recente primeiro)
+            filteredHistory.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Atualizar estatísticas
+            totalSimulationsElement.textContent = `${filteredHistory.length} simulação${filteredHistory.length !== 1 ? 'ões' : ''}`;
+            
+            if (startDate && endDate) {
+                dateRangeElement.textContent = `Período: ${formatDate(startDate)} - ${formatDate(endDate)}`;
+            } else {
+                dateRangeElement.textContent = 'Período: Todos os dias';
+            }
+            
+            // Limpar lista
+            historyList.innerHTML = '';
+            
+            if (filteredHistory.length === 0) {
+                noHistoryElement.style.display = 'block';
+                return;
+            }
+            
+            noHistoryElement.style.display = 'none';
+            
+            // Adicionar cada item do histórico
+            filteredHistory.forEach(simulation => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const simDate = new Date(simulation.date);
+                const formattedDate = formatDate(simDate);
+                const formattedTime = simulation.formattedTime || simDate.toLocaleTimeString('pt-BR');
+                
+                const balance = simulation.totals?.remainingHours || 
+                               (simulation.totals?.initialHours - simulation.totals?.usedHours) || 0;
+                
+                let statusClass = '';
+                let statusText = '';
+                
+                if (balance > 0) {
+                    statusClass = 'status-pending';
+                    statusText = 'Pendente';
+                } else if (balance < 0) {
+                    statusClass = 'status-over';
+                    statusText = 'Reduziu além';
+                } else {
+                    statusClass = 'status-completed';
+                    statusText = 'Concluído';
+                }
+                
+                let balanceClass = '';
+                if (balance > 0) balanceClass = 'negative';
+                else if (balance < 0) balanceClass = 'positive';
+                else balanceClass = 'neutral';
+                
+                historyItem.innerHTML = `
+                    <div>
+                        <div class="history-date">${formattedDate}</div>
+                        <div class="history-time">${formattedTime}</div>
+                    </div>
+                    <div>
+                        <span class="history-total">
+                            ${simulation.totals?.remainingHours?.toFixed(1) || '0.0'}h
+                        </span>
+                    </div>
+                    <div>
+                        <span class="history-total ${balanceClass}">
+                            ${balance >= 0 ? '+' : ''}${balance.toFixed(1)}h
+                        </span>
+                    </div>
+                    <div>
+                        <span class="history-status ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <div>
+                        <button class="delete-btn" onclick="deleteSimulation(${simulation.id})" title="Excluir simulação">
+                            <i data-feather="trash-2"></i>
+                        </button>
+                    </div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // Atualizar ícones
+            feather.replace();
+        }
+        
+        function deleteSimulation(id) {
+            if (!confirm('Tem certeza que deseja excluir esta simulação?')) {
+                return;
+            }
+            
+            simulationHistory = simulationHistory.filter(sim => sim.id !== id);
+            localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+            
+            updateHistoryDisplay();
+            showNotification('Simulação excluída com sucesso!', 'success');
+        }
+        
+        function clearAllHistory() {
+            if (simulationHistory.length === 0) {
+                showNotification('O histórico já está vazio.', 'info');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir TODAS as ${simulationHistory.length} simulações?\n\nEsta ação não pode ser desfeita.`)) {
+                simulationHistory = [];
+                localStorage.removeItem('hoursReducerHistory');
+                
+                updateHistoryDisplay();
+                showNotification('Histórico limpo com sucesso!', 'success');
+            }
+        }
+        
+        function exportHistory() {
+            if (simulationHistory.length === 0) {
+                showNotification('Nenhuma simulação para exportar.', 'info');
+                return;
+            }
+            
+            const dataStr = JSON.stringify(simulationHistory, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            const exportDate = new Date().toISOString().split('T')[0];
+            const exportFileDefaultName = `historico-simulacoes-${exportDate}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification(`Histórico exportado com ${simulationHistory.length} simulações!`, 'success');
+        }
+        
+        function showNotification(message, type) {
+            // Criar elemento de notificação
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-3 rounded-lg shadow-lg text-white font-medium z-50 ${
+                type === 'success' ? 'bg-green-500' : 
+                type === 'error' ? 'bg-red-500' : 
+                'bg-blue-500'
+            }`;
+            notification.textContent = message;
+            notification.style.animation = 'slideIn 0.3s ease-out';
+            
+            document.body.appendChild(notification);
+            
+            // Remover após 3 segundos
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Adicionar animações CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+            
+            .border-red-500 {
+                border-color: #ef4444 !important;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
