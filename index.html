@@ -532,6 +532,293 @@
             color: #4f46e5;
         }
 
+        /* Histórico de Simulações - MODIFICADO */
+        .history-container {
+            background: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .history-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .month-filter {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .month-select {
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            background-color: white;
+            color: #4b5563;
+            font-size: 0.875rem;
+        }
+
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .history-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .history-date-time {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .history-date {
+            font-size: 0.875rem;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-time {
+            font-size: 0.75rem;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .history-total {
+            font-weight: 600;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            background-color: #f3f4f6;
+            display: inline-block;
+        }
+
+        .history-people {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .history-person {
+            font-size: 0.875rem;
+            padding: 0.25rem 0.5rem;
+            background-color: #f3f4f6;
+            border-radius: 0.375rem;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-person-name {
+            color: #4b5563;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .history-person-hours {
+            font-weight: 500;
+            margin-left: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .history-person-hours.positive {
+            color: #10b981;
+        }
+
+        .history-person-hours.negative {
+            color: #ef4444;
+        }
+
+        .history-person-hours.neutral {
+            color: #3b82f6;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 2rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .delete-history-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s;
+        }
+
+        .delete-history-btn:hover {
+            background-color: #fee2e2;
+        }
+
+        .bulk-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .select-all-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .history-checkbox {
+            margin-right: 0.5rem;
+        }
+
+        .delete-selected-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .delete-selected-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            transform: translateY(-2px);
+        }
+
+        .history-stats {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+
+        .history-item.selected {
+            background-color: #e0e7ff;
+            border-left: 3px solid #4f46e5;
+        }
+
+        /* Estilo para o botão de abrir histórico */
+        #open-history-btn {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        #open-history-btn:hover {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .clear-history-btn {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .clear-history-btn:hover {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            transform: translateY(-2px);
+        }
+
+        .history-export-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .history-export-btn:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+        }
+
         /* Animações */
         @keyframes modalFadeIn {
             from {
@@ -591,24 +878,28 @@
 
         /* Scrollbar personalizada */
         .results-container::-webkit-scrollbar,
-        .person-selection-container::-webkit-scrollbar {
+        .person-selection-container::-webkit-scrollbar,
+        .history-list::-webkit-scrollbar {
             width: 8px;
         }
 
         .results-container::-webkit-scrollbar-track,
-        .person-selection-container::-webkit-scrollbar-track {
+        .person-selection-container::-webkit-scrollbar-track,
+        .history-list::-webkit-scrollbar-track {
             background: #f1f1f1;
             border-radius: 4px;
         }
 
         .results-container::-webkit-scrollbar-thumb,
-        .person-selection-container::-webkit-scrollbar-thumb {
+        .person-selection-container::-webkit-scrollbar-thumb,
+        .history-list::-webkit-scrollbar-thumb {
             background: #c1c1c1;
             border-radius: 4px;
         }
 
         .results-container::-webkit-scrollbar-thumb:hover,
-        .person-selection-container::-webkit-scrollbar-thumb:hover {
+        .person-selection-container::-webkit-scrollbar-thumb:hover,
+        .history-list::-webkit-scrollbar-thumb:hover {
             background: #a1a1a1;
         }
     </style>
@@ -619,7 +910,8 @@
         class CustomNavbar extends HTMLElement {
             connectedCallback() {
                 this.attachShadow({ mode: 'open' });
-                this.shadowRoot.innerHTML = `
+                this.shadowRoot.innerHTML = 
+                `
                     <style>
                         nav {
                             background-color: #4f46e5;
@@ -713,6 +1005,11 @@
             <button id="calculate-hours" class="calculate-btn">
                 <i data-feather="refresh-cw"></i>
                 Calcular Saldo de Todas as Pessoas
+            </button>
+            
+            <button id="open-history-btn" class="calculate-btn mt-4" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                <i data-feather="history"></i>
+                Abrir Histórico Completo
             </button>
             
             <div id="results-container" class="results-container hidden">
@@ -928,6 +1225,64 @@
                 </div>
             </div>
         </div>
+
+        <!-- Seção de Histórico de Simulações - MODIFICADO -->
+        <section class="history-container">
+            <div class="history-header">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i data-feather="history"></i>
+                    Histórico de Simulações
+                </div>
+                <div class="history-actions">
+                    <button id="clear-history-btn" class="clear-history-btn">
+                        <i data-feather="trash-2"></i>
+                        Limpar Tudo
+                    </button>
+                    <button id="export-history-btn" class="history-export-btn">
+                        <i data-feather="download"></i>
+                        Exportar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="history-controls">
+                <div class="month-filter">
+                    <label for="month-filter-select" style="font-size: 0.875rem; color: #4b5563;">
+                        <i data-feather="calendar" style="width: 16px; height: 16px; vertical-align: middle;"></i>
+                        Filtrar por mês:
+                    </label>
+                    <select id="month-filter-select" class="month-select">
+                        <option value="all">Todos os meses</option>
+                        <!-- Os meses serão gerados dinamicamente -->
+                    </select>
+                </div>
+                <div id="history-stats" class="history-stats">
+                    <!-- Estatísticas serão geradas dinamicamente -->
+                </div>
+            </div>
+            
+            <div id="history-list" class="history-list">
+                <!-- O histórico será gerado dinamicamente -->
+                <div class="no-history" id="no-history-message">
+                    <i data-feather="clock" style="width: 48px; height: 48px; margin-bottom: 1rem;"></i>
+                    <p>Nenhuma simulação realizada ainda.</p>
+                    <p class="text-sm mt-2">Realize cálculos para ver o histórico aqui.</p>
+                </div>
+            </div>
+            
+            <div id="bulk-actions" class="bulk-actions hidden">
+                <div class="select-all-checkbox">
+                    <input type="checkbox" id="select-all-histories">
+                    <label for="select-all-histories">Selecionar todas</label>
+                </div>
+                <button id="delete-selected-btn" class="delete-selected-btn">
+                    <i data-feather="trash-2"></i>
+                    Excluir Selecionadas (<span id="selected-count">0</span>)
+                </button>
+            </div>
+            
+            <input type="file" id="import-history-file" accept=".json" style="display: none;">
+        </section>
     </main>
 
     <!-- Footer Component -->
@@ -1112,6 +1467,12 @@
             // Dados das pessoas - AGORA COM 10 PESSOAS
             let peopleData = {};
             
+            // Histórico de simulações
+            let simulationHistory = [];
+            
+            // Variáveis para controle do histórico
+            let currentFilterMonth = 'all';
+            
             // Inicializar 10 pessoas
             for (let i = 1; i <= 10; i++) {
                 peopleData[`person${i}`] = {
@@ -1129,6 +1490,12 @@
             const savedData = localStorage.getItem('hoursReducerData10');
             if (savedData) {
                 peopleData = JSON.parse(savedData);
+            }
+            
+            // Carregar histórico salvo
+            const savedHistory = localStorage.getItem('hoursReducerHistory');
+            if (savedHistory) {
+                simulationHistory = JSON.parse(savedHistory);
             }
             
             // Inicializar funcionalidades
@@ -1287,12 +1654,21 @@
                 document.getElementById('save-person-config').addEventListener('click', savePersonConfig);
                 document.getElementById('clear-day-config').addEventListener('click', clearDayConfig);
                 resetBtn.addEventListener('click', resetAllData);
+                document.getElementById('open-history-btn').addEventListener('click', openHistoryPage);
                 
                 // Configurar botões de seleção rápida
                 document.getElementById('select-all-btn').addEventListener('click', () => selectAllPeople(true));
                 document.getElementById('select-none-btn').addEventListener('click', () => selectAllPeople(false));
                 document.getElementById('select-odd-btn').addEventListener('click', selectOddPeople);
                 document.getElementById('select-even-btn').addEventListener('click', selectEvenPeople);
+                
+                // Configurar eventos do histórico
+                document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+                document.getElementById('export-history-btn').addEventListener('click', exportHistory);
+                document.getElementById('month-filter-select').addEventListener('change', filterHistoryByMonth);
+                document.getElementById('select-all-histories').addEventListener('change', toggleSelectAllHistories);
+                document.getElementById('delete-selected-btn').addEventListener('click', deleteSelectedHistories);
+                document.getElementById('import-history-file').addEventListener('change', importHistory);
                 
                 // Alternar entre tipo trabalho/folga/sábado
                 document.querySelectorAll('input[name="work-type"]').forEach(radio => {
@@ -1304,6 +1680,10 @@
                 
                 // Calcular horas usadas
                 calculateUsedHours();
+                
+                // Atualizar histórico na inicialização
+                updateMonthFilterOptions();
+                updateHistoryDisplay();
             }
             
             function generatePersonInputs() {
@@ -1703,6 +2083,9 @@
                 
                 // Mostrar resultados
                 resultsContainer.classList.remove('hidden');
+                
+                // Salvar no histórico
+                saveToHistory();
             }
             
             function resetAllData() {
@@ -1752,6 +2135,371 @@
                 localStorage.setItem('hoursReducerData10', JSON.stringify(peopleData));
             }
             
+            // Funções do histórico
+            function saveToHistory() {
+                const now = new Date();
+                const simulation = {
+                    id: Date.now(),
+                    date: now.toISOString(),
+                    formattedDate: now.toLocaleDateString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }),
+                    formattedTime: now.toLocaleTimeString('pt-BR', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    }),
+                    monthYear: `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`,
+                    monthName: monthsPTBR[now.getMonth()],
+                    year: now.getFullYear(),
+                    people: {},
+                    totals: {
+                        initialHours: 0,
+                        usedHours: 0,
+                        remainingHours: 0,
+                        allZero: false,
+                        anyPositive: false
+                    },
+                    selected: false
+                };
+                
+                // Salvar dados de cada pessoa
+                for (let i = 1; i <= 10; i++) {
+                    const person = peopleData[`person${i}`];
+                    simulation.people[`person${i}`] = {
+                        name: person.name,
+                        initialHours: person.initialHours,
+                        usedHours: person.usedHours,
+                        balance: person.initialHours - person.usedHours
+                    };
+                    
+                    simulation.totals.initialHours += person.initialHours;
+                    simulation.totals.usedHours += person.usedHours;
+                }
+                
+                simulation.totals.remainingHours = simulation.totals.initialHours - simulation.totals.usedHours;
+                
+                // Verificar status
+                simulation.totals.allZero = Object.values(simulation.people).every(p => p.balance === 0);
+                simulation.totals.anyPositive = Object.values(simulation.people).some(p => p.balance > 0);
+                
+                // Adicionar ao histórico (máximo de 100 simulações)
+                simulationHistory.unshift(simulation);
+                if (simulationHistory.length > 100) {
+                    simulationHistory = simulationHistory.slice(0, 100);
+                }
+                
+                // Salvar no localStorage
+                localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+                
+                // Atualizar filtros e exibição
+                updateMonthFilterOptions();
+                updateHistoryDisplay();
+            }
+            
+            function updateMonthFilterOptions() {
+                const monthSelect = document.getElementById('month-filter-select');
+                
+                // Manter a opção "Todos os meses"
+                monthSelect.innerHTML = '<option value="all">Todos os meses</option>';
+                
+                // Coletar meses únicos do histórico
+                const uniqueMonths = new Set();
+                simulationHistory.forEach(sim => {
+                    uniqueMonths.add(sim.monthYear);
+                });
+                
+                // Converter para array e ordenar (mais recente primeiro)
+                const sortedMonths = Array.from(uniqueMonths).sort().reverse();
+                
+                // Adicionar opções de mês
+                sortedMonths.forEach(monthYear => {
+                    const [year, month] = monthYear.split('-');
+                    const monthName = monthsPTBR[parseInt(month) - 1];
+                    const option = document.createElement('option');
+                    option.value = monthYear;
+                    option.textContent = `${monthName}/${year}`;
+                    monthSelect.appendChild(option);
+                });
+            }
+            
+            function filterHistoryByMonth() {
+                currentFilterMonth = document.getElementById('month-filter-select').value;
+                updateHistoryDisplay();
+            }
+            
+            function updateHistoryDisplay() {
+                const historyList = document.getElementById('history-list');
+                const noHistoryMessage = document.getElementById('no-history-message');
+                const bulkActions = document.getElementById('bulk-actions');
+                const historyStats = document.getElementById('history-stats');
+                
+                // Filtrar histórico pelo mês selecionado
+                let filteredHistory = simulationHistory;
+                if (currentFilterMonth !== 'all') {
+                    filteredHistory = simulationHistory.filter(sim => sim.monthYear === currentFilterMonth);
+                }
+                
+                if (filteredHistory.length === 0) {
+                    noHistoryMessage.classList.remove('hidden');
+                    bulkActions.classList.add('hidden');
+                    historyStats.textContent = '';
+                    historyList.innerHTML = '';
+                    historyList.appendChild(noHistoryMessage);
+                    return;
+                }
+                
+                noHistoryMessage.classList.add('hidden');
+                historyList.innerHTML = '';
+                
+                // Mostrar estatísticas
+                const totalSimulations = filteredHistory.length;
+                const thisMonth = new Date().getMonth();
+                const thisYear = new Date().getFullYear();
+                const currentMonthSimulations = filteredHistory.filter(sim => 
+                    sim.monthYear === `${thisYear}-${(thisMonth + 1).toString().padStart(2, '0')}`
+                ).length;
+                
+                historyStats.innerHTML = `
+                    <i data-feather="bar-chart" style="width: 16px; height: 16px; vertical-align: middle;"></i>
+                    ${totalSimulations} simulação${totalSimulations !== 1 ? 'ões' : ''} 
+                    ${currentFilterMonth === 'all' ? 
+                      `(${currentMonthSimulations} este mês)` : 
+                      'neste mês'}
+                `;
+                
+                // Criar cada item do histórico
+                filteredHistory.forEach(simulation => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = `history-item ${simulation.selected ? 'selected' : ''}`;
+                    historyItem.dataset.id = simulation.id;
+                    
+                    // Cabeçalho com data/hora e botão de exclusão
+                    const headerDiv = document.createElement('div');
+                    headerDiv.className = 'history-item-header';
+                    
+                    const dateTimeDiv = document.createElement('div');
+                    dateTimeDiv.className = 'history-date-time';
+                    
+                    const dateDiv = document.createElement('div');
+                    dateDiv.className = 'history-date';
+                    dateDiv.innerHTML = `
+                        <i data-feather="calendar" style="width: 14px; height: 14px;"></i>
+                        <span>${simulation.formattedDate}</span>
+                    `;
+                    
+                    const timeDiv = document.createElement('div');
+                    timeDiv.className = 'history-time';
+                    timeDiv.innerHTML = `
+                        <i data-feather="clock" style="width: 12px; height: 12px;"></i>
+                        <span>${simulation.formattedTime}</span>
+                    `;
+                    
+                    dateTimeDiv.appendChild(dateDiv);
+                    dateTimeDiv.appendChild(timeDiv);
+                    
+                    // Checkbox para seleção
+                    const checkboxDiv = document.createElement('div');
+                    checkboxDiv.className = 'select-all-checkbox';
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.className = 'history-checkbox';
+                    checkbox.checked = simulation.selected;
+                    checkbox.dataset.id = simulation.id;
+                    checkbox.addEventListener('change', toggleHistorySelection);
+                    
+                    checkboxDiv.appendChild(checkbox);
+                    
+                    headerDiv.appendChild(dateTimeDiv);
+                    headerDiv.appendChild(checkboxDiv);
+                    
+                    // Total geral
+                    const totalDiv = document.createElement('div');
+                    totalDiv.className = 'history-total';
+                    const statusIcon = simulation.totals.allZero ? '✓' : 
+                                      !simulation.totals.anyPositive ? '✓' : '⏳';
+                    const statusText = simulation.totals.allZero ? 'Todas zeradas' :
+                                      !simulation.totals.anyPositive ? 'Reduziram além' : 'A reduzir';
+                    totalDiv.textContent = `${statusIcon} ${statusText} | Total: ${simulation.totals.remainingHours.toFixed(1)}h`;
+                    
+                    // Lista de pessoas
+                    const peopleDiv = document.createElement('div');
+                    peopleDiv.className = 'history-people';
+                    
+                    Object.values(simulation.people).forEach(person => {
+                        if (person.name && (person.initialHours > 0 || person.usedHours > 0)) {
+                            const personDiv = document.createElement('div');
+                            personDiv.className = 'history-person';
+                            
+                            const nameSpan = document.createElement('span');
+                            nameSpan.className = 'history-person-name';
+                            nameSpan.textContent = person.name;
+                            
+                            const hoursSpan = document.createElement('span');
+                            hoursSpan.className = 'history-person-hours';
+                            hoursSpan.textContent = `${person.balance >= 0 ? '+' : ''}${person.balance.toFixed(1)}h`;
+                            
+                            // Aplicar cor baseada no saldo
+                            if (person.balance > 0) {
+                                hoursSpan.classList.add('negative');
+                            } else if (person.balance < 0) {
+                                hoursSpan.classList.add('positive');
+                            } else {
+                                hoursSpan.classList.add('neutral');
+                            }
+                            
+                            personDiv.appendChild(nameSpan);
+                            personDiv.appendChild(hoursSpan);
+                            peopleDiv.appendChild(personDiv);
+                        }
+                    });
+                    
+                    historyItem.appendChild(headerDiv);
+                    historyItem.appendChild(totalDiv);
+                    historyItem.appendChild(peopleDiv);
+                    historyList.appendChild(historyItem);
+                });
+                
+                // Mostrar/ocultar ações em massa
+                const selectedCount = simulationHistory.filter(sim => sim.selected).length;
+                if (selectedCount > 0) {
+                    bulkActions.classList.remove('hidden');
+                    document.getElementById('selected-count').textContent = selectedCount;
+                } else {
+                    bulkActions.classList.add('hidden');
+                }
+                
+                feather.replace();
+            }
+            
+            function toggleHistorySelection(event) {
+                const id = parseInt(event.target.dataset.id);
+                const simulation = simulationHistory.find(sim => sim.id === id);
+                
+                if (simulation) {
+                    simulation.selected = event.target.checked;
+                    localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+                    updateHistoryDisplay();
+                }
+            }
+            
+            function toggleSelectAllHistories(event) {
+                const isChecked = event.target.checked;
+                const filteredHistory = currentFilterMonth === 'all' ? 
+                    simulationHistory : 
+                    simulationHistory.filter(sim => sim.monthYear === currentFilterMonth);
+                
+                filteredHistory.forEach(sim => {
+                    sim.selected = isChecked;
+                });
+                
+                localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+                updateHistoryDisplay();
+            }
+            
+            function deleteSelectedHistories() {
+                const selectedHistories = simulationHistory.filter(sim => sim.selected);
+                
+                if (selectedHistories.length === 0) {
+                    alert('Nenhuma simulação selecionada para excluir.');
+                    return;
+                }
+                
+                const confirmMessage = selectedHistories.length === 1 ? 
+                    'Tem certeza que deseja excluir esta simulação?' :
+                    `Tem certeza que deseja excluir ${selectedHistories.length} simulações?`;
+                
+                if (confirm(confirmMessage + '\n\nEsta ação não pode ser desfeita.')) {
+                    // Remover simulações selecionadas
+                    simulationHistory = simulationHistory.filter(sim => !sim.selected);
+                    localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+                    
+                    updateMonthFilterOptions();
+                    updateHistoryDisplay();
+                    
+                    alert(`✅ ${selectedHistories.length} simulação${selectedHistories.length !== 1 ? 'ões' : ''} excluída${selectedHistories.length !== 1 ? 's' : ''} com sucesso!`);
+                }
+            }
+            
+            function clearHistory() {
+                if (simulationHistory.length === 0) {
+                    alert('O histórico já está vazio.');
+                    return;
+                }
+                
+                if (confirm('Tem certeza que deseja limpar TODO o histórico de simulações?\n\nEsta ação não pode ser desfeita.')) {
+                    simulationHistory = [];
+                    localStorage.removeItem('hoursReducerHistory');
+                    updateMonthFilterOptions();
+                    updateHistoryDisplay();
+                    alert('✅ Histórico limpo com sucesso!');
+                }
+            }
+            
+            function exportHistory() {
+                if (simulationHistory.length === 0) {
+                    alert('Nenhuma simulação no histórico para exportar.');
+                    return;
+                }
+                
+                const dataStr = JSON.stringify(simulationHistory, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportFileDefaultName = `historico-simulacoes-${new Date().toISOString().split('T')[0]}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportFileDefaultName);
+                linkElement.click();
+                
+                alert(`✅ Histórico exportado com ${simulationHistory.length} simulações!`);
+            }
+            
+            function importHistory(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                if (!confirm('Importar histórico substituirá o histórico atual. Deseja continuar?')) {
+                    event.target.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedHistory = JSON.parse(e.target.result);
+                        
+                        // Validar estrutura
+                        if (!Array.isArray(importedHistory)) {
+                            throw new Error('Formato inválido');
+                        }
+                        
+                        simulationHistory = importedHistory.slice(0, 100); // Limitar a 100
+                        localStorage.setItem('hoursReducerHistory', JSON.stringify(simulationHistory));
+                        
+                        updateMonthFilterOptions();
+                        updateHistoryDisplay();
+                        
+                        alert(`✅ Histórico importado com sucesso! ${simulationHistory.length} simulações carregadas.`);
+                    } catch (error) {
+                        alert('❌ Erro ao importar histórico. Verifique se o arquivo é válido.');
+                        console.error('Erro na importação:', error);
+                    }
+                    
+                    event.target.value = '';
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            function openHistoryPage() {
+                window.open('historico.html', '_blank');
+            }
+            
             // Event Listeners para calendário
             prevMonthBtn.addEventListener('click', () => {
                 currentMonth--;
@@ -1794,4 +2542,3 @@
     </script>
 </body>
 </html>
-
